@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Lukin Aleksandr
+// Copyright (c) 2022 Lukin Aleksandr
 #ifndef MAIN_OS_DELAY_H_
 #define MAIN_OS_DELAY_H_
 

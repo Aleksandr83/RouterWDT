@@ -1,3 +1,4 @@
+// Copyright (c) 2022 Lukin Aleksandr
 #include "RouterPowerController.h"
 
 RouterPowerController::RouterPowerController() {

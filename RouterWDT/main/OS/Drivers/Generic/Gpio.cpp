@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Lukin Aleksandr
+// Copyright (c) 2022 Lukin Aleksandr
 extern "C" {
 #include <driver/gpio.h>
 }

@@ -1,10 +1,10 @@
-// Copyright (c) 2021 Lukin Aleksandr
+// Copyright (c) 2022 Lukin Aleksandr
 #ifndef MAIN_OS_DRIVERS_GENERIC_GPIO_H_
 #define MAIN_OS_DRIVERS_GENERIC_GPIO_H_
 
 #pragma once
 
-#include "pio.h"
+#include "Pio.h"
 
 namespace Drivers {
 namespace Generic {

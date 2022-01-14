@@ -1,38 +1,43 @@
-
-// Copyright (c) 2021 Lukin Aleksandr
+// Copyright (c) 2022 Lukin Aleksandr
 extern "C" {
 #include <freertos/FreeRTOS.h>
 #include <esp_wifi.h>
 #include <esp_system.h>
 #include <esp_event.h>
-#include <esp_event_loop.h>
 #include <nvs_flash.h>
 #include <driver/gpio.h>
 
 void app_main(void);
 }
 
+#include "Initializator.h"
 #include "RouterWDT.h"
 
+#include "Delay.h"
 
-void Init();
-void EnableWiFi();
-void DisableWiFi();
 
-esp_err_t event_handler(void *ctx, system_event_t *event)
-{
-    return ESP_OK;
-}
+using OS::Initializator;
 
 void app_main(void)
 {
+	//Initialize NVS
+	esp_err_t ret = nvs_flash_init();
+	if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
+	{
+	      ESP_ERROR_CHECK(nvs_flash_erase());
+	      ret = nvs_flash_init();
+	}
+	ESP_ERROR_CHECK(ret);
 
-    nvs_flash_init();
-    tcpip_adapter_init();
-    ESP_ERROR_CHECK( esp_event_loop_init(event_handler, NULL) );
+    Initializator::Run();
 
-    RouterWDT *routerWDT = new RouterWDT();
+    static RouterWDT *routerWDT = new RouterWDT();
     routerWDT->Run();
+
+    for(;;)
+    {
+        OS::Delay::Ms(1000);
+    }
 
 }
 

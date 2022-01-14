@@ -1,6 +1,7 @@
-// Copyright (c) 2021 Lukin Aleksandr
+// Copyright (c) 2022 Lukin Aleksandr
 #include "Led.h"
 #include "Gpio.h"
+#include <stddef.h>
 
 namespace Drivers {
 

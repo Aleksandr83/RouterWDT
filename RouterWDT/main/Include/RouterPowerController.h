@@ -1,3 +1,4 @@
+// Copyright (c) 2022 Lukin Aleksandr
 #ifndef MAIN_ROUTERPOWERCONTROLLER_H_
 #define MAIN_ROUTERPOWERCONTROLLER_H_
 
