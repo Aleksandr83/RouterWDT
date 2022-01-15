@@ -4,17 +4,25 @@
 
 #pragma once
 
-#include "Led.h"
+#include "Pio.h"
+#include "StatusLed.h"
+#include "PinSwitcher.h"
 
-using Drivers::Led;
-using Drivers::Pio;
+using Drivers::Generic::Pio;
+using OS::Types::StatusLed;
+using OS::Types::Generic::PinSwitcher;
 
-class RouterPowerController : public Led
+class RouterPowerController
+	: public PinSwitcher, public StatusLed
 {
+
 public:
 	RouterPowerController();
 	RouterPowerController(Pio *pio, int pin);
 	virtual ~RouterPowerController();
+
+	virtual void On()  override;
+	virtual void Off() override;
 };
 
 #endif /* MAIN_ROUTERPOWERCONTROLLER_H_ */

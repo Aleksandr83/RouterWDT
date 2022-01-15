@@ -1,14 +1,14 @@
 # RouterWDT
 
-FOR ESP32-WROOM-32
+#ESP32-WROOM-32
 
 
 Problems:
 
 There were problems associated with the stability of the Wi Fi connection on the d-link router.
-He had the following Wi FI settings:
-	Network Authentication: Mixed WPA/WPA2 -PSK
-	WPA Encryption:		TKIP+AES
+He had the following Wi FI settings: </br>
+	Network Authentication: Mixed WPA/WPA2 -PSK </br>
+	WPA Encryption:		TKIP+AES </br>	
 
 In this mode, Wi Fi connected, worked for several seconds, the connection was broken, and for a sufficiently long time it was not restored.
 

@@ -9,36 +9,14 @@ using Drivers::Generic::Gpio;
 using Drivers::Generic::TPinDirection;
 
 Led::Led()
+	: PinSwitcher()
 {
 }
 
 Led::Led(Pio *pio, int pin)
+	: PinSwitcher(pio, pin)
 {
-	_Pin = pin;
-	_Pio = (pio == NULL)? new Gpio() : pio;
-	_Pio->SetPinDirection(TPinDirection::Output , _Pin);
-}
 
-void Led::On()
-{
-	Pio* portIO = GetPortIO();
-	portIO->SetPin(GetPin());
-}
-
-void Led::Off()
-{
-	Pio* portIO = GetPortIO();
-	portIO->ResetPin(GetPin());
-}
-
-Pio* Led::GetPortIO()
-{
-	return _Pio;
-}
-
-int32_t Led::GetPin()
-{
-	return _Pin;
 }
 
 Led::~Led() {

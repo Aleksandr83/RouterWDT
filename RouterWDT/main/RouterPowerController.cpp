@@ -1,14 +1,29 @@
 // Copyright (c) 2022 Lukin Aleksandr
 #include "RouterPowerController.h"
 
-RouterPowerController::RouterPowerController() {
+
+RouterPowerController::RouterPowerController()
+	: PinSwitcher(), StatusLed()
+{
 	// TODO Auto-generated constructor stub
 
 }
 
 RouterPowerController::RouterPowerController(Pio *pio, int pin)
-	:Led(pio,pin)
+	: PinSwitcher(pio,pin), StatusLed()
 {
+}
+
+void RouterPowerController::On()
+{
+	PinSwitcher::On();
+	StatusLedOn();
+}
+
+void RouterPowerController::Off()
+{
+	PinSwitcher::Off();
+	StatusLedOff();
 }
 
 RouterPowerController::~RouterPowerController() {

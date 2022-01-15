@@ -38,10 +38,10 @@ esp_event_handler_instance_t WiFiClient::_EventAnyId;
 esp_event_handler_instance_t WiFiClient::_EventGotIP;
 
 WiFiClient::WiFiClient()
-	:_IsShowPasswordInLog(false),_IsConnected(false),_IsRunConnect(false)
+	:StatusLed(), _IsShowPasswordInLog(false),_IsConnected(false),_IsRunConnect(false)
 {
-	_WiFiLed        = LedFactory::Create(TLedType::WiFi);
 	_WiFiEventGroup = xEventGroupCreate();
+
 	RegistredWiFiEventHandler();
 	RegistredIPEventHandler();
 }
@@ -109,9 +109,19 @@ bool WiFiClient::IsConnected()
 	return _IsConnected;
 }
 
+bool WiFiClient::IsRunConnect()
+{
+	return _IsRunConnect;
+}
+
 void WiFiClient::Connect()
 {
-	if (IsConnected()) return;
+	if (IsConnected())
+	{
+		return;
+	}
+
+
 	ESP_LOGI(TAG, "Init WiFi\n");
 
 	ESP_ERROR_CHECK( esp_wifi_start() );
@@ -169,12 +179,12 @@ void WiFiClient::IpEventHandler
 		ip_event_got_ip_t* event = (ip_event_got_ip_t*) eventData;
 		ESP_LOGI(TAG, "ip:" IPSTR, IP2STR(&event->ip_info.ip));
 
-		xEventGroupSetBits(_WiFiEventGroup, WIFI_CONNECTED_BIT);
-
 		auto client = WiFiClientFactory::Create();
 
 		if (client != NULL)
 			client->OnConnected();
+
+		xEventGroupSetBits(_WiFiEventGroup, WIFI_CONNECTED_BIT);
 
 		return;
 	}
@@ -184,14 +194,14 @@ void WiFiClient::OnConnected()
 {
 	ESP_LOGI(TAG, "WiFi is connected\n");
 	_IsConnected = true;
-	if (_WiFiLed != NULL) _WiFiLed->On();
+	StatusLedOn();
 }
 
 void WiFiClient::OnDisconnected()
 {
 	ESP_LOGI(TAG, "WiFi is disconnected\n");
 	_IsConnected = false;
-	if (_WiFiLed != NULL) _WiFiLed->Off();
+	StatusLedOff();
 }
 
 WiFiClient::~WiFiClient() {

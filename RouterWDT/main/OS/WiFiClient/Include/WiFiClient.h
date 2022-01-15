@@ -10,22 +10,20 @@ extern "C" {
 #include "freertos/event_groups.h"
 }
 
-#include "Led.h"
+#include "StatusLed.h"
 
-using Drivers::Led;
+using OS::Types::StatusLed;
 
 namespace OS {
 namespace WiFi {
 
-class WiFiClient {
+class WiFiClient : public StatusLed {
 public:
 	bool _IsShowPasswordInLog;
 
 private:
 	bool _IsConnected;
 	bool _IsRunConnect;
-
-	shared_ptr<Led> _WiFiLed;
 
 	static esp_event_handler_instance_t _EventAnyId;
 	static esp_event_handler_instance_t _EventGotIP;
@@ -45,6 +43,8 @@ public:
 	void Reconnect();
 
 private:
+
+	bool IsRunConnect();
 
 	void RegistredWiFiEventHandler();
 	void RegistredIPEventHandler();

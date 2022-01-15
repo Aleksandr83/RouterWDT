@@ -4,27 +4,19 @@
 
 #pragma once
 
-#include "Pio.h"
+#include "PinSwitcher.h"
 
 namespace Drivers {
 
 using Drivers::Generic::Pio;
+using OS::Types::Generic::PinSwitcher;
 
-class Led {
-private:
-	Pio*        _Pio;
-	GpioPinType _Pin;
+class Led : public PinSwitcher {
 public:
 	Led();
 	Led(Pio *pio, int pin);
 	virtual ~Led();
 
-	void On();
-	void Off();
-
-protected:
-	virtual Pio*        GetPortIO();
-	virtual GpioPinType GetPin();
 };
 
 } /* namespace Drivers */

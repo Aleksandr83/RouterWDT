@@ -11,7 +11,9 @@ extern "C" {
 using OS::Delay;
 using OS::WiFi::WiFiClientFactory;
 
-RouterWDT::RouterWDT() {
+RouterWDT::RouterWDT()
+	: _RouterPowerController(NULL)
+{
 
 }
 
@@ -19,14 +21,16 @@ void RouterWDT::Init()
 {
 	_PowerLed   = LedFactory::Create(TLedType::PWR);
 	_WiFiLed    = LedFactory::Create(TLedType::WiFi);
+
 	_RouterPowerController = CreateRouterPowerController();
+	_RouterPowerController->SetStatusLed(_PowerLed);
+	_RouterPowerController->On();
 
 	_WiFiClient = WiFiClientFactory::Create();	
+	_WiFiClient->SetStatusLed(_WiFiLed);
 	_WiFiClient->Init();
 
 }
-
-
 
 RouterPowerController* RouterWDT::CreateRouterPowerController()
 {
