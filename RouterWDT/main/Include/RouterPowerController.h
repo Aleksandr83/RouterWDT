@@ -17,7 +17,6 @@ class RouterPowerController
 {
 
 public:
-	RouterPowerController();
 	RouterPowerController(Pio *pio, int pin);
 	virtual ~RouterPowerController();
 

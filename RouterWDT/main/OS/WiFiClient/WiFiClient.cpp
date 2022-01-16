@@ -1,5 +1,4 @@
 // Copyright (c) 2022 Lukin Aleksandr
-
 extern "C" {
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -30,7 +29,7 @@ static const char *TAG = "WiFi Client";
 namespace OS   {
 namespace WiFi {
 
-using OS::Tcp::TcpAdaptor;
+using OS::Net::Tcp::TcpAdaptor;
 using OS::Delay;
 
 EventGroupHandle_t  WiFiClient::_WiFiEventGroup;
@@ -40,10 +39,12 @@ esp_event_handler_instance_t WiFiClient::_EventGotIP;
 WiFiClient::WiFiClient()
 	:StatusLed(), _IsShowPasswordInLog(false),_IsConnected(false),_IsRunConnect(false)
 {
-	_WiFiEventGroup = xEventGroupCreate();
+	_WiFiEventGroup   = xEventGroupCreate();
 
 	RegistredWiFiEventHandler();
 	RegistredIPEventHandler();
+
+	_ConectionCounter = make_shared<Counter<uint8_t>>();
 }
 
 void WiFiClient::Init()
@@ -114,11 +115,16 @@ bool WiFiClient::IsRunConnect()
 	return _IsRunConnect;
 }
 
-void WiFiClient::Connect()
+bool WiFiClient::Connect()
 {
 	if (IsConnected())
 	{
-		return;
+		return true;
+	}
+
+	if (!IsRunConnect())
+	{
+		_IsRunConnect = true;
 	}
 
 
@@ -127,6 +133,8 @@ void WiFiClient::Connect()
 	ESP_ERROR_CHECK( esp_wifi_start() );
 
 	WaitEvents();
+
+	return IsConnected();
 }
 
 void WiFiClient::Reconnect()
@@ -202,6 +210,11 @@ void WiFiClient::OnDisconnected()
 	ESP_LOGI(TAG, "WiFi is disconnected\n");
 	_IsConnected = false;
 	StatusLedOff();
+}
+
+shared_ptr<Counter<uint8_t>> WiFiClient::GetConectionCounter()
+{
+	return _ConectionCounter;
 }
 
 WiFiClient::~WiFiClient() {

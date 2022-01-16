@@ -15,7 +15,6 @@ void app_main(void);
 
 #include "Delay.h"
 
-
 using OS::Initializator;
 
 void app_main(void)

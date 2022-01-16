@@ -5,8 +5,8 @@ extern "C" {
 
 #include "LedFactory.h"
 
-#define LED_PWR_PIN  GPIO_NUM_13
-#define LED_WIFI_PIN GPIO_NUM_12
+#define LED_PWR_PIN  GPIO_NUM_27
+#define LED_WIFI_PIN GPIO_NUM_26
 
 shared_ptr<Led> LedFactory::_PowerLed = NULL;
 shared_ptr<Led> LedFactory::_WiFiLed  = NULL;

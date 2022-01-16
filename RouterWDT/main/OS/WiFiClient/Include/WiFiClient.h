@@ -11,11 +11,14 @@ extern "C" {
 }
 
 #include "StatusLed.h"
+#include "Counter.h"
 
 using OS::Types::StatusLed;
 
 namespace OS {
 namespace WiFi {
+
+using OS::Types::Generic::Counter;
 
 class WiFiClient : public StatusLed {
 public:
@@ -24,6 +27,7 @@ public:
 private:
 	bool _IsConnected;
 	bool _IsRunConnect;
+	shared_ptr<Counter<uint8_t>> _ConectionCounter;
 
 	static esp_event_handler_instance_t _EventAnyId;
 	static esp_event_handler_instance_t _EventGotIP;
@@ -38,9 +42,11 @@ public:
 
 	bool IsConnected();
 
-	void Connect();
+	bool Connect();
 	void Disconnect();
 	void Reconnect();
+
+	shared_ptr<Counter<uint8_t>> GetConectionCounter();
 
 private:
 

@@ -8,11 +8,6 @@ namespace Drivers {
 using Drivers::Generic::Gpio;
 using Drivers::Generic::TPinDirection;
 
-Led::Led()
-	: PinSwitcher()
-{
-}
-
 Led::Led(Pio *pio, int pin)
 	: PinSwitcher(pio, pin)
 {

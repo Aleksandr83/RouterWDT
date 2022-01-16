@@ -6,6 +6,7 @@ extern "C" {
 #include "TcpAdaptor.h"
 
 namespace OS {
+namespace Net {
 namespace Tcp {
 
 void TcpAdaptor::Init()
@@ -15,4 +16,5 @@ void TcpAdaptor::Init()
 }
 
 } /* namespace Tcp */
+} /* namespace Net */
 } /* namespace OS */

@@ -19,7 +19,7 @@ using OS::WiFi::WiFiClient;
 
 class RouterWDT {
 private:
-	const GpioPinType ROUTER_PWR_PIN = GPIO_NUM_14;
+	const GpioPinType ROUTER_PWR_PIN = GPIO_NUM_25;
 
 	shared_ptr<Led> _WiFiLed;
 	shared_ptr<Led> _PowerLed;

@@ -2,6 +2,8 @@
 #ifndef OS_TYPES_GENERIC_SWITCHER_H_
 #define OS_TYPES_GENERIC_SWITCHER_H_
 
+
+
 namespace OS {
 namespace Types {
 namespace Generic {

@@ -13,7 +13,6 @@ using OS::Types::Generic::PinSwitcher;
 
 class Led : public PinSwitcher {
 public:
-	Led();
 	Led(Pio *pio, int pin);
 	virtual ~Led();
 

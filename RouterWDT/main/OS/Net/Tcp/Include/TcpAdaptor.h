@@ -3,6 +3,7 @@
 #define OS_TCP_TCPADAPTOR_H_
 
 namespace OS {
+namespace Net {
 namespace Tcp {
 
 class TcpAdaptor {
@@ -11,6 +12,7 @@ public:
 };
 
 } /* namespace Tcp */
+} /* namespace Net */
 } /* namespace OS */
 
 #endif /* OS_TCP_TCPADAPTOR_H_ */

@@ -20,7 +20,6 @@ private:
 	GpioPinType _Pin;
 
 public:
-	PinSwitcher();
 	PinSwitcher(Pio *pio, int pin);
 	virtual ~PinSwitcher();
 

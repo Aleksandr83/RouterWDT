@@ -10,13 +10,6 @@ namespace Generic {
 using Drivers::Generic::Gpio;
 using Drivers::Generic::TPinDirection;
 
-PinSwitcher::PinSwitcher()
-	: Switcher(), _Pio(NULL)
-{
-	// TODO Auto-generated constructor stub
-
-}
-
 PinSwitcher::PinSwitcher(Pio *pio, int pin)
 	: Switcher()
 {

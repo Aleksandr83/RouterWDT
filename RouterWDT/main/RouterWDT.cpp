@@ -3,13 +3,17 @@ extern "C" {
 #include <freertos/FreeRTOS.h>
 }
 
+#include "Settings.h"
 #include <RouterWDT.h>
 #include "Delay.h"
 #include "LedFactory.h"
 #include "WiFiClientFactory.h"
+#include "Dns.h"
 
 using OS::Delay;
 using OS::WiFi::WiFiClientFactory;
+
+using OS::Net::Dns;
 
 RouterWDT::RouterWDT()
 	: _RouterPowerController(NULL)
@@ -28,6 +32,7 @@ void RouterWDT::Init()
 
 	_WiFiClient = WiFiClientFactory::Create();	
 	_WiFiClient->SetStatusLed(_WiFiLed);
+	_WiFiClient->GetConectionCounter()->Max()->SetValue(DEF_NUMBER_CONNECTION_ATTEMPTS_WIFI);
 	_WiFiClient->Init();
 
 }
@@ -43,11 +48,27 @@ void RouterWDT::Run()
 
 	for(;;)
 	{
-		if (!_WiFiClient->IsConnected())
+		// start test
+		auto _Counter = _WiFiClient->GetConectionCounter();
+		printf("Counter value: %d\n",_Counter->GetValue());
+		if (_Counter->IsMaxLimit())
 		{
-			_WiFiClient->Connect();
+			printf("Counter is max value. His was the reset. \n");
+			_Counter->Reset();
+		}
+		else
+			_Counter->Inc();
+		// end test
+
+		if (!_WiFiClient->Connect())
+		{
+			Delay::Ms(1000);
 			continue;
 		}
+
+
+
+		//Dns::GetIp4AddressByName("www.google.com");
 
     	Delay::Ms(1000);
 	}
