@@ -11,6 +11,8 @@ namespace OS {
 class Delay {
 public:
 	static void Ms(uint32_t value);
+
+	static TickType_t GetDelayTicksMs(uint32_t value);
 };
 
 } /* namespace OS */

@@ -18,10 +18,14 @@ ip_addr_t Dns::GetIp4AddressByName(char* domain)
 	memset(&hint, 0, sizeof(hint));
 	memset(&target_addr, 0, sizeof(target_addr));
 
-	getaddrinfo(domain, NULL, &hint, &res);
-	struct in_addr addr4 = ((struct sockaddr_in *) (res->ai_addr))->sin_addr;
-	inet_addr_to_ip4addr(ip_2_ip4(&target_addr), &addr4);
-	freeaddrinfo(res);
+	esp_err_t err = getaddrinfo(domain, NULL, &hint, &res);
+
+	if (!err)
+	{
+		struct in_addr addr4 = ((struct sockaddr_in *) (res->ai_addr))->sin_addr;
+		inet_addr_to_ip4addr(ip_2_ip4(&target_addr), &addr4);
+		freeaddrinfo(res);
+	}
 
 	return target_addr;
 }

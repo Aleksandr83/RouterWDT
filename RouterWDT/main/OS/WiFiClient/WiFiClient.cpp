@@ -32,25 +32,26 @@ namespace WiFi {
 using OS::Net::Tcp::TcpAdaptor;
 using OS::Delay;
 
-EventGroupHandle_t  WiFiClient::_WiFiEventGroup;
 esp_event_handler_instance_t WiFiClient::_EventAnyId;
 esp_event_handler_instance_t WiFiClient::_EventGotIP;
+
+EventGroupHandle_t  WiFiClient::_WiFiEventGroup = xEventGroupCreate();
 
 WiFiClient::WiFiClient()
 	:StatusLed(), _IsShowPasswordInLog(false),_IsConnected(false),_IsRunConnect(false)
 {
-	_WiFiEventGroup   = xEventGroupCreate();
-
 	RegistredWiFiEventHandler();
 	RegistredIPEventHandler();
 
 	_ConectionCounter = make_shared<Counter<uint8_t>>();
+
+	TcpAdaptor::Init();
+	esp_netif_create_default_wifi_sta();
 }
 
 void WiFiClient::Init()
 {
-	TcpAdaptor::Init();
-	esp_netif_create_default_wifi_sta();
+	ESP_LOGI(TAG, "Init WiFi\n");
 
 	wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
 	ESP_ERROR_CHECK(esp_wifi_init(&cfg));
@@ -103,6 +104,7 @@ void WiFiClient::WaitEvents()
 			_WiFiEventGroup,
 			WIFI_CONNECTED_BIT | WIFI_FAIL_BIT, pdFALSE, pdFALSE, portMAX_DELAY
 		);
+	xEventGroupClearBits(_WiFiEventGroup, WIFI_CONNECTED_BIT | WIFI_FAIL_BIT);
 }
 
 bool WiFiClient::IsConnected()
@@ -127,29 +129,34 @@ bool WiFiClient::Connect()
 		_IsRunConnect = true;
 	}
 
+	printf("Trying to connect to WiFi (number %d)\n", _ConectionCounter->GetValue());
 
-	ESP_LOGI(TAG, "Init WiFi\n");
+	Init();
 
-	ESP_ERROR_CHECK( esp_wifi_start() );
+	esp_wifi_start();
 
 	WaitEvents();
+
+	_ConectionCounter->Inc();
 
 	return IsConnected();
 }
 
-void WiFiClient::Reconnect()
-{
-	Disconnect();
-	Connect();
-}
-
 void WiFiClient::Disconnect()
 {
+	printf("wifi disconnect\n");
+
+	esp_wifi_disconnect();
+	Delay::Ms(200);
+
 	esp_wifi_stop();
 	Delay::Ms(200);
 
 	esp_wifi_deinit();
 	Delay::Ms(200);
+
+	esp_wifi_restore();
+
 }
 
 void WiFiClient::WiFiEventHandler
@@ -159,20 +166,22 @@ void WiFiClient::WiFiEventHandler
 
 	if (eventId == WIFI_EVENT_STA_START)
 	{
-		ESP_ERROR_CHECK( esp_wifi_connect() );
+		esp_wifi_connect();
+
 		return;
 	}
 
 	if (eventId == WIFI_EVENT_STA_DISCONNECTED)
 	{
-		xEventGroupSetBits(_WiFiEventGroup, WIFI_FAIL_BIT);
 
 		auto client = WiFiClientFactory::Create();
 		if (client != NULL)
 		{
 			client->OnDisconnected();
-			client->Reconnect();
+			client->Disconnect();
 		}
+
+		xEventGroupSetBits(_WiFiEventGroup, WIFI_FAIL_BIT);
 		return;
 	}
 }
@@ -215,6 +224,12 @@ void WiFiClient::OnDisconnected()
 shared_ptr<Counter<uint8_t>> WiFiClient::GetConectionCounter()
 {
 	return _ConectionCounter;
+}
+
+void WiFiClient::ResetState()
+{
+	_IsRunConnect = false;
+	_ConectionCounter->Reset();
 }
 
 WiFiClient::~WiFiClient() {

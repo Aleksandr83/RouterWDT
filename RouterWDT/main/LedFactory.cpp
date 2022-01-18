@@ -16,13 +16,13 @@ shared_ptr<Led> LedFactory::Create(TLedType ledType)
 	if (ledType == TLedType::PWR)
 	{
 		if (_PowerLed == NULL)
-			_PowerLed = make_shared<Led>((Drivers::Generic::Pio*)NULL, LED_PWR_PIN);
+			_PowerLed = make_shared<Led>(static_cast<Drivers::Generic::Pio*>(NULL), LED_PWR_PIN);
 		return _PowerLed;
 	}
 	if (ledType == TLedType::WiFi)
 	{
 		if (_WiFiLed == NULL)
-			_WiFiLed = make_shared<Led>((Drivers::Generic::Pio*)NULL,  LED_WIFI_PIN);
+			_WiFiLed = make_shared<Led>(static_cast<Drivers::Generic::Pio*>(NULL), LED_WIFI_PIN);
 		return _WiFiLed;
 	}
 	return NULL;

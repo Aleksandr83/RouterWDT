@@ -41,16 +41,16 @@ public:
 	void Init();
 
 	bool IsConnected();
+	bool IsRunConnect();
 
 	bool Connect();
 	void Disconnect();
-	void Reconnect();
 
 	shared_ptr<Counter<uint8_t>> GetConectionCounter();
 
-private:
+	void ResetState();
 
-	bool IsRunConnect();
+private:
 
 	void RegistredWiFiEventHandler();
 	void RegistredIPEventHandler();
