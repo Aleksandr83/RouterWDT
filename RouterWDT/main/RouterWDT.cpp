@@ -9,6 +9,7 @@ extern "C" {
 #include "LedFactory.h"
 #include "WiFiClientFactory.h"
 
+
 using OS::Delay;
 using OS::WiFi::WiFiClientFactory;
 
@@ -23,8 +24,7 @@ void RouterWDT::Init()
 	InitLed();
 	InitRouterPowerController();
 	InitWiFiClient();
-	InitIcmp();
-
+	InitDomainChecker();
 }
 
 void RouterWDT::InitLed()
@@ -33,9 +33,11 @@ void RouterWDT::InitLed()
 	_WiFiLed    = LedFactory::Create(TLedType::WiFi);
 }
 
-void RouterWDT::InitIcmp()
+void RouterWDT::InitDomainChecker()
 {
-	_Icmp = make_shared<Icmp>();
+	_DomainChecker = make_shared<DomainChecker>();
+	_DomainChecker->Init();
+	_DomainChecker->GetErrorCounter()->Max()->SetValue(DEF_NUMBER_ERRORS_PING);
 }
 
 void RouterWDT::InitWiFiClient()
@@ -58,6 +60,7 @@ void RouterWDT::Run()
 {
 	Init();
 
+
 	for(;;)
 	{
 		if (!_WiFiClient->IsConnected())
@@ -72,7 +75,6 @@ void RouterWDT::Run()
 			{
 				if (_WiFiClient->GetConectionCounter()->IsMaxLimit())
 				{
-					_WiFiClient->ResetState();
 					RouterReboot();
 				}
 				Delay::Ms(1000);
@@ -80,18 +82,26 @@ void RouterWDT::Run()
 			}
 		}
 
-		if (!_Icmp->Ping((char*)"Mail.ru", 3))
+		if (!_DomainChecker->IsChecked())
 		{
-
+			if (!_DomainChecker->Check())
+			{
+				if (_DomainChecker->GetErrorCounter()->IsMaxLimit())
+				{
+					RouterReboot();
+				}
+				Delay::Ms(1000);
+			}
 		}
 
-
-    	Delay::Ms(1000);
+		Delay::Ms(100);
 	}
 }
 
 void RouterWDT::RouterReboot()
 {
+	_WiFiClient->ResetState();
+	_DomainChecker->ResetState();
 	printf("\nWaiting for router reboot...\n");
 
 	_RouterPowerController->Off();

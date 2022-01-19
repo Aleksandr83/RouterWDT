@@ -5,6 +5,7 @@
 #pragma once
 
 extern "C" {
+#include <freertos/FreeRTOS.h>
 #include <freertos/event_groups.h>
 #include <ping/ping_sock.h>
 }

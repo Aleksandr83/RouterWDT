@@ -8,6 +8,7 @@ extern "C" {
 #include "Icmp.h"
 #include "Delay.h"
 #include "Dns.h"
+#include "Delay.h"
 
 #define ICMP_OK_BIT 	BIT0
 
@@ -44,13 +45,13 @@ void Icmp::Init()
 	cbs.cb_args 		= NULL;
 
 	esp_ping_new_session(&ping_config, &cbs, &_PingHandle);
+
 }
 
 bool Icmp::Ping(char* domain, uint8_t count)
 {
 	uint32_t transmitted;
 	uint32_t received;
-	uint32_t total_time_ms;
 
 	_Domain    = domain;
 	_PingCount = count;
@@ -62,11 +63,10 @@ bool Icmp::Ping(char* domain, uint8_t count)
 
 	esp_ping_get_profile(_PingHandle, ESP_PING_PROF_REQUEST,  &transmitted,   sizeof(transmitted));
 	esp_ping_get_profile(_PingHandle, ESP_PING_PROF_REPLY, 	  &received, 	  sizeof(received));
-	esp_ping_get_profile(_PingHandle, ESP_PING_PROF_DURATION, &total_time_ms, sizeof(total_time_ms));
 
-	esp_ping_delete_session(&_PingHandle);
+	esp_ping_delete_session(_PingHandle);
 
-	return (transmitted == received&&received != 0&&total_time_ms < 500);
+	return (transmitted == received&&received != 0);
 }
 
 void Icmp::OnPingSuccess(esp_ping_handle_t hdl, void *args)

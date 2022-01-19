@@ -7,12 +7,16 @@
 #include <cstdint>
 #include <iostream>
 #include <stddef.h>
-//#include <stdio.h>
+#include <list>
 #include <memory>
+#include <string>
 
 #define  MCU_TYPE ESP32
 
 typedef int32_t GpioPinType;
+
+using std::list;
+using std::string;
 
 using std::shared_ptr;
 using std::make_shared;

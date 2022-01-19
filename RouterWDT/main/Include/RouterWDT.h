@@ -13,21 +13,21 @@ extern "C" {
 #include "Led.h"
 #include "RouterPowerController.h"
 #include "WiFiClient.h"
-#include "Icmp.h"
+#include "DomainChecker.h"
 
 using Drivers::Led;
 using OS::WiFi::WiFiClient;
-using OS::Net::Icmp;
 
 class RouterWDT {
 private:
 	const GpioPinType ROUTER_PWR_PIN = GPIO_NUM_25;
 
-	shared_ptr<Led> 		_WiFiLed;
-	shared_ptr<Led> 		_PowerLed;
+	shared_ptr<Led> 		  _WiFiLed;
+	shared_ptr<Led> 		  _PowerLed;
 
-	shared_ptr<Icmp> 		_Icmp;
-	shared_ptr<WiFiClient> 	_WiFiClient;
+	shared_ptr<WiFiClient> 	  _WiFiClient;
+
+	shared_ptr<DomainChecker> _DomainChecker;
 
 	shared_ptr<RouterPowerController> _RouterPowerController;
 
@@ -41,8 +41,8 @@ public:
 private:
 	void Init();
 	void InitLed();
-	void InitIcmp();
 	void InitWiFiClient();
+	void InitDomainChecker();
 	void InitRouterPowerController();
 
 };
