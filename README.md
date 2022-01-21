@@ -1,7 +1,7 @@
 # RouterWDT
 
 #ESP32-WROOM-32
-
+This device reboots the router if Wifi or Internet stops working
 
 Problems:
 

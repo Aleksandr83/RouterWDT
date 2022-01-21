@@ -8,10 +8,12 @@ extern "C" {
 #include "Delay.h"
 #include "LedFactory.h"
 #include "WiFiClientFactory.h"
-
+#include "Device.h"
 
 using OS::Delay;
+using OS::System::Device;
 using OS::WiFi::WiFiClientFactory;
+
 
 RouterWDT::RouterWDT()
 	: _RouterPowerController(NULL)
@@ -55,16 +57,16 @@ void RouterWDT::InitRouterPowerController()
 	_RouterPowerController->On();
 }
 
-
 void RouterWDT::Run()
 {
 	Init();
-
 
 	for(;;)
 	{
 		if (!_WiFiClient->IsConnected())
 		{
+			_DomainChecker->Disable();
+
 			if (!_WiFiClient->IsRunConnect())
 			{
 				printf("\nWaiting for the router to load(%d seconds)...\n", DEF_TIME_ROUTER_LOAD/1000);
@@ -82,15 +84,12 @@ void RouterWDT::Run()
 			}
 		}
 
-		if (!_DomainChecker->IsChecked())
+		if (_WiFiClient->IsConnected())
 		{
-			if (!_DomainChecker->Check())
+			_DomainChecker->Enable();
+			if (_DomainChecker->GetErrorCounter()->IsMaxLimit())
 			{
-				if (_DomainChecker->GetErrorCounter()->IsMaxLimit())
-				{
-					RouterReboot();
-				}
-				Delay::Ms(1000);
+				RouterReboot();
 			}
 		}
 
@@ -100,15 +99,17 @@ void RouterWDT::Run()
 
 void RouterWDT::RouterReboot()
 {
+	_DomainChecker->Disable();
+	_WiFiClient->Disconnect();
 	_WiFiClient->ResetState();
-	_DomainChecker->ResetState();
+
 	printf("\nWaiting for router reboot...\n");
 
 	_RouterPowerController->Off();
 
 	Delay::Ms(DEF_TIME_SHUTDOWN_ROUTER);
 
-	_RouterPowerController->On();
+	Device::Reboot();
 }
 
 RouterWDT::~RouterWDT() {

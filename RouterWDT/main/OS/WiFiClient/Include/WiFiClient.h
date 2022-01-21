@@ -12,8 +12,10 @@ extern "C" {
 
 #include "StatusLed.h"
 #include "Counter.h"
+#include "Timer.h"
 
 using OS::Types::StatusLed;
+using OS::System::Timer;
 
 namespace OS {
 namespace WiFi {
@@ -27,7 +29,8 @@ public:
 private:
 	bool _IsConnected;
 	bool _IsRunConnect;
-	shared_ptr<Counter<uint8_t>> _ConectionCounter;
+	shared_ptr<Counter<uint8_t>>   _ConectionCounter;
+	shared_ptr<Timer<WiFiClient*>> _WaitConnectionTimer;
 
 	static esp_event_handler_instance_t _EventAnyId;
 	static esp_event_handler_instance_t _EventGotIP;
@@ -60,7 +63,9 @@ private:
 	static void IpEventHandler
 		(void* arg, esp_event_base_t eventBase, int32_t eventId, void* eventData);
 
+	void ResetEvents();
 	void WaitEvents();
+	static void OnWaitConnectionTimer(Timer<WiFiClient*>* timer, WiFiClient* wifiClient);
 
 	void OnConnected();
 	void OnDisconnected();

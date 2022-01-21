@@ -43,15 +43,19 @@ WiFiClient::WiFiClient()
 	RegistredWiFiEventHandler();
 	RegistredIPEventHandler();
 
-	_ConectionCounter = make_shared<Counter<uint8_t>>();
+	_ConectionCounter    = make_shared<Counter<uint8_t>>();
+	_WaitConnectionTimer = make_shared<Timer<WiFiClient*>>(5000, OnWaitConnectionTimer, this);
 
 	TcpAdaptor::Init();
 	esp_netif_create_default_wifi_sta();
+
+
 }
 
 void WiFiClient::Init()
 {
 	ESP_LOGI(TAG, "Init WiFi\n");
+	esp_wifi_restore();
 
 	wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
 	ESP_ERROR_CHECK(esp_wifi_init(&cfg));
@@ -97,6 +101,11 @@ void WiFiClient::RegistredIPEventHandler()
 		);
 }
 
+void WiFiClient::ResetEvents()
+{
+	xEventGroupClearBits(_WiFiEventGroup, WIFI_CONNECTED_BIT | WIFI_FAIL_BIT);
+}
+
 void WiFiClient::WaitEvents()
 {
 	xEventGroupWaitBits
@@ -104,7 +113,6 @@ void WiFiClient::WaitEvents()
 			_WiFiEventGroup,
 			WIFI_CONNECTED_BIT | WIFI_FAIL_BIT, pdFALSE, pdFALSE, portMAX_DELAY
 		);
-	xEventGroupClearBits(_WiFiEventGroup, WIFI_CONNECTED_BIT | WIFI_FAIL_BIT);
 }
 
 bool WiFiClient::IsConnected()
@@ -123,22 +131,20 @@ bool WiFiClient::Connect()
 	{
 		return true;
 	}
-
 	if (!IsRunConnect())
 	{
 		_IsRunConnect = true;
 	}
-
 	printf("Trying to connect to WiFi (number %d)\n", _ConectionCounter->GetValue());
+	_WaitConnectionTimer->Start();
+	ResetEvents();
 
 	Init();
-
 	esp_wifi_start();
 
 	WaitEvents();
-
+	_WaitConnectionTimer->Stop();
 	_ConectionCounter->Inc();
-
 	return IsConnected();
 }
 
@@ -147,16 +153,13 @@ void WiFiClient::Disconnect()
 	printf("wifi disconnect\n");
 
 	esp_wifi_disconnect();
-	Delay::Ms(200);
+	Delay::Ms(10);
 
 	esp_wifi_stop();
-	Delay::Ms(200);
+	Delay::Ms(10);
 
 	esp_wifi_deinit();
-	Delay::Ms(200);
-
-	esp_wifi_restore();
-
+	Delay::Ms(10);
 }
 
 void WiFiClient::WiFiEventHandler
@@ -230,6 +233,12 @@ void WiFiClient::ResetState()
 {
 	_IsRunConnect = false;
 	_ConectionCounter->Reset();
+}
+
+void WiFiClient::OnWaitConnectionTimer(Timer<WiFiClient*>* timer, WiFiClient* wifiClient)
+{
+	wifiClient->Disconnect();
+	xEventGroupSetBits(_WiFiEventGroup, WIFI_FAIL_BIT);
 }
 
 WiFiClient::~WiFiClient() {

@@ -23,7 +23,6 @@ void RandomDomainList::Init()
 	Add("www.netflix.com");
 	Add("www.spotify.com");
 	Add("www.baidu.com");
-	Add("www.xnxx.com");
 	Add("www.vk.com");
 	Add("www.live.com");
 	Add("www.ok.ru");
