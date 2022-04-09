@@ -3,6 +3,7 @@ extern "C" {
 #include <lwip/inet.h>
 #include <lwip/sockets.h>
 #include <esp_event.h>
+#include <esp_netif_ip_addr.h>
 }
 
 #include "Icmp.h"
